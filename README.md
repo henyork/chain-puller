@@ -3,3 +3,5 @@ Firmware for ESP8266 NodeMCU board to control light fixture pull chain with a se
 
 
 ![Photo1](photo1.JPG)
+
+Instructions for esp-homekit-sdk should be followed to build the firmware: https://github.com/espressif/esp-homekit-sdk
