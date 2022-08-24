@@ -4,8 +4,7 @@
 #
 
 HOMEKIT_PATH ?= $(abspath $(shell pwd)/../..)
-COMMON_COMPONENT_PATH ?= $(abspath $(shell pwd)/../common)
-
+COMMON_COMPONENT_PATH ?= $(HOMEKIT_PATH)/examples/common/
 
 PROJECT_NAME := lightbulb
 EXTRA_COMPONENT_DIRS += $(HOMEKIT_PATH)/components/

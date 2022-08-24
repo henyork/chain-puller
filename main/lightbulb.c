@@ -32,6 +32,9 @@
 #include <stdbool.h>
 #include "esp_log.h"
 #include "servo.h"
+#include "sense.h"
+#include <freertos/FreeRTOS.h>
+#include <freertos/task.h>
 static const char *TAG = "lightbulb";
 
 /**
@@ -40,6 +43,7 @@ static const char *TAG = "lightbulb";
 void lightbulb_init(void)
 {   
     servo_init();
+    adc_setup();
     ESP_LOGI(TAG, "Initializing PWM Driver");
 }
 
@@ -48,7 +52,18 @@ void lightbulb_init(void)
  */
 int lightbulb_set_on(bool value)
 {
-    ESP_LOGI(TAG, "lightbulb_set_on : %s", value == true ? "true" : "false");
-    servo_toggle();
+    
+    int i = 0;
+    /*while(state_check() != value && i < 3){
+        ESP_LOGI(TAG, "lightbulb_set_on : %s", value == true ? "true" : "false");
+        servo_toggle();
+        i++;
+    }*/
+    if(state_check()!= value){
+        //ESP_LOGI(TAG, "lightbulb_set_on : %s", value == true ? "true" : "false");
+        servo_toggle();
+        i++;
+    }
+
     return 0;
 }

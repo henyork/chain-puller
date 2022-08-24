@@ -1,4 +1,3 @@
-
 # (Automatically converted from project Makefile by convert_to_cmake.py.)
 
 # The following lines of boilerplate have to be in your project's CMakeLists
@@ -7,11 +6,12 @@ cmake_minimum_required(VERSION 3.5)
 
 if(DEFINED ENV{HOMEKIT_PATH})
   set(HOMEKIT_PATH $ENV{HOMEKIT_PATH})
+  set(COMMON_COMPONENT_PATH ${HOMEKIT_PATH}/examples/common/)
 else()
   set(HOMEKIT_PATH ${CMAKE_CURRENT_LIST_DIR}/../..)
 endif(DEFINED ENV{HOMEKIT_PATH})
 
-set(EXTRA_COMPONENT_DIRS ${HOMEKIT_PATH}/components ${HOMEKIT_PATH}/components/homekit ${CMAKE_CURRENT_LIST_DIR}/../common)
+set(EXTRA_COMPONENT_DIRS ${HOMEKIT_PATH}/components ${HOMEKIT_PATH}/components/homekit ${COMMON_COMPONENT_PATH})
 
 include($ENV{IDF_PATH}/tools/cmake/project.cmake)
 project(lightbulb)

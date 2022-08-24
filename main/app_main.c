@@ -43,6 +43,8 @@
 
 #include "lightbulb.h"
 
+#include "sense.h"
+
 /* Comment out the below line to disable Firmware Upgrades */
 #define CONFIG_FIRMWARE_SERVICE
 
@@ -60,6 +62,11 @@ static const char *TAG = "HAP lightbulb";
 
 /* The button "Boot" will be used as the Reset button for the example */
 #define RESET_GPIO  GPIO_NUM_0
+
+
+
+
+
 /**
  * @brief The network reset button callback handler.
  * Useful for testing the Wi-Fi re-configuration feature of WAC2
@@ -143,9 +150,9 @@ static void lightbulb_thread_entry(void *arg)
      * the mandatory services internally
      */
     hap_acc_cfg_t cfg = {
-        .name = "Esp-Light",
-        .manufacturer = "Espressif",
-        .model = "EspLight01",
+        .name = "Fluorescent Tubes",
+        .manufacturer = "Henry York",
+        .model = "ArgH",
         .serial_num = "abcdefg",
         .fw_rev = "0.9.0",
         .hw_rev = "1.0",
@@ -169,21 +176,32 @@ static void lightbulb_thread_entry(void *arg)
     hap_acc_add_wifi_transport_service(accessory, 0);
 
     /* Create the Light Bulb Service. Include the "name" since this is a user visible service  */
-    service = hap_serv_lightbulb_create(true);
+    bool val = 0;
+    if(state_check() != -1){
+        val = state_check();
+    }
+    service = hap_serv_lightbulb_create(val);
     if (!service) {
         ESP_LOGE(TAG, "Failed to create LightBulb Service");
         goto light_err;
     }
 
     /* Add the optional characteristic to the Light Bulb Service */
-    int ret = hap_serv_add_char(service, hap_char_name_create("My Light"));
-    ret |= hap_serv_add_char(service, hap_char_brightness_create(50));
+
     
+
+    //int ret = hap_serv_add_char(service, hap_char_name_create("My Light"));
+    //ret |= hap_serv_add_char(service, hap_char_brightness_create(100));
+    //brightness = hap_serv_get_char_by_uuid(service, HAP_CHAR_UUID_BRIGHTNESS);
+   
+    hap_char_t *on_char = hap_serv_get_char_by_uuid(service, HAP_CHAR_UUID_ON);
     
+
+    /*
     if (ret != HAP_SUCCESS) {
         ESP_LOGE(TAG, "Failed to add optional characteristics to LightBulb");
         goto light_err;
-    }
+    }*/
     /* Set the write callback for the service */
     hap_serv_set_write_cb(service, lightbulb_write);
     
@@ -254,6 +272,21 @@ static void lightbulb_thread_entry(void *arg)
     /* Start Wi-Fi */
     app_wifi_start(portMAX_DELAY);
 
+    hap_val_t on_val = {
+        .b=true,
+    };
+   
+    while(1){
+        if(state_check() != -1){
+            on_val.b = state_check();
+        }
+        //ESP_LOGI(TAG, "state check = %d", state_check());
+        //ESP_LOGI(TAG, "updatating brightness = %d", on_val.b);
+        hap_char_update_val(on_char, &on_val);
+        vTaskDelay(3000/portTICK_PERIOD_MS);
+    }
+
+
     /* The task ends here. The read/write callbacks will be invoked by the HAP Framework */
     vTaskDelete(NULL);
 
@@ -262,8 +295,17 @@ light_err:
     vTaskDelete(NULL);
 }
 
+void hc_monitor(){
+    
+    
+}
+
+
+
+
 void app_main()
 {
     xTaskCreate(lightbulb_thread_entry, LIGHTBULB_TASK_NAME, LIGHTBULB_TASK_STACKSIZE,
             NULL, LIGHTBULB_TASK_PRIORITY, NULL);
+    //xTaskCreate(hc_monitor, "hc monitor", LIGHTBULB_TASK_STACKSIZE, NULL, LIGHTBULB_TASK_PRIORITY, NULL);
 }
